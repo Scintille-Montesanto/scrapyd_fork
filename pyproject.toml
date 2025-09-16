@@ -5,11 +5,11 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "scrapyd"
 version = "1.6.0"
-authors = [{name = "Scrapy developers", email = "info@scrapy.org"}]
+authors = [{ name = "Scrapy developers", email = "info@scrapy.org" }]
 description = "A service for running Scrapy spiders, with an HTTP API"
 readme = "README.rst"
-license = {text = "BSD"}
-urls = {Homepage = "https://github.com/scrapy/scrapyd"}
+license = { text = "BSD" }
+urls = { Homepage = "https://github.com/scrapy/scrapyd" }
 classifiers = [
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
@@ -24,24 +24,25 @@ classifiers = [
     "Topic :: Internet :: WWW/HTTP",
 ]
 dependencies = [
-  "packaging",
-  "pywin32;platform_system=='Windows'",
-  "scrapy>=2.0.0",
-  # https://setuptools.pypa.io/en/latest/history.html#v80-9-0
-  "setuptools>=67.7.0,<81",
-  "twisted>=17.9",
-  "w3lib",
-  "zope.interface",
+    "packaging",
+    "pywin32;platform_system=='Windows'",
+    # "scrapy>=2.0.0",
+    "scrapy @ git+https://github.com/Scintille-Montesanto/scrapy_fork@master",
+    # https://setuptools.pypa.io/en/latest/history.html#v80-9-0
+    "setuptools>=67.7.0,<81",
+    "twisted>=17.9",
+    "w3lib",
+    "zope.interface",
 ]
 
 [project.optional-dependencies]
 test = [
-  "coverage",
-  "py-html-checker",
-  "pytest",
-  "pytest-twisted",
-  "requests",
-  "twisted>=19.7",  # twisted.logger.capturedLogs
+    "coverage",
+    "py-html-checker",
+    "pytest",
+    "pytest-twisted",
+    "requests",
+    "twisted>=19.7", # twisted.logger.capturedLogs
 ]
 docs = [
     "furo",
@@ -64,31 +65,31 @@ target-version = "py310"
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = [
-  "ANN", "COM", "EM",
-  # https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
-  "W191", "E501", "D206", "Q000", "Q001", "Q002", "Q003", "ISC001",
-  "D203", "D212",  # ignore incompatible rules
-  "D200",  # documentation preferences
-  "C901", "PLR0912",  # complexity preferences
+    "ANN", "COM", "EM",
+    # https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
+    "W191", "E501", "D206", "Q000", "Q001", "Q002", "Q003", "ISC001",
+    "D203", "D212", # ignore incompatible rules
+    "D200", # documentation preferences
+    "C901", "PLR0912", # complexity preferences
 
-  # Project-specific
-  "D",
-  "ARG002",  # Unused method argument (txrequest argument isn't always used)
-  "N802",  # Function name should be lowercase (Twisted uses method names like render_GET)
-  "N803",  # Argument name should be lowercase (Twisted uses argument names like avatarId)
-  "N815",  # Variable in class scope should not be mixedCase (Twisted uses class attributes like requestAvatarId)
-  "PLR0913",  # Too many arguments to function call
-  "S603",  # `subprocess` call: check for execution of untrusted input (informative)
-  "TRY003",  # Avoid specifying long messages outside the exception class
+    # Project-specific
+    "D",
+    "ARG002", # Unused method argument (txrequest argument isn't always used)
+    "N802", # Function name should be lowercase (Twisted uses method names like render_GET)
+    "N803", # Argument name should be lowercase (Twisted uses argument names like avatarId)
+    "N815", # Variable in class scope should not be mixedCase (Twisted uses class attributes like requestAvatarId)
+    "PLR0913", # Too many arguments to function call
+    "S603", # `subprocess` call: check for execution of untrusted input (informative)
+    "TRY003", # Avoid specifying long messages outside the exception class
 
-  # sqlite3 doesn't have functions like psycopg2.sql.Identifier and psycopg2.sql.SQL.format.
-  "S608",  # Possible SQL injection vector through string-based query construction
+    # sqlite3 doesn't have functions like psycopg2.sql.Identifier and psycopg2.sql.SQL.format.
+    "S608", # Possible SQL injection vector through string-based query construction
 
-  # Scrapyd uses naive datetimes.
-  "DTZ001",  # `datetime.datetime()` called without a `tzinfo` argument"
-  "DTZ005",  # `datetime.datetime.now()` called without a `tz` argument
-  "DTZ006",  # `datetime.datetime.fromtimestamp()` called without a `tz` argument
-  "DTZ007",  # Naive datetime constructed using `datetime.datetime.strptime()` without %z
+    # Scrapyd uses naive datetimes.
+    "DTZ001", # `datetime.datetime()` called without a `tzinfo` argument"
+    "DTZ005", # `datetime.datetime.now()` called without a `tz` argument
+    "DTZ006", # `datetime.datetime.fromtimestamp()` called without a `tz` argument
+    "DTZ007", # Naive datetime constructed using `datetime.datetime.strptime()` without %z
 ]
 
 [tool.ruff.lint.flake8-builtins]
@@ -99,11 +100,11 @@ builtins-ignorelist = ["copyright"]
 "scrapyd/__main__.py" = ["T201"]  #  `print` found
 "scrapyd/interfaces.py" = ["N805"]  # First argument of a method should be named `self`
 "{tests,integration_tests}/*" = [
-  "D",  # docstring
-  "S101",  # assert
-  "S106",  # password
-  "S113",  # requests timeout
-  "PLR2004",  # magic value
-  "ARG001", "ARG002", "ARG005",  # mocks
-  "PT009", "PT027",  # Scrapyd mixes unittest with pytest
+    "D", # docstring
+    "S101", # assert
+    "S106", # password
+    "S113", # requests timeout
+    "PLR2004", # magic value
+    "ARG001", "ARG002", "ARG005", # mocks
+    "PT009", "PT027", # Scrapyd mixes unittest with pytest
 ]

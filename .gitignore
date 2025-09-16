@@ -17,3 +17,6 @@
 /eggs
 /items
 /logs
+
+# Jetbrains
+/.idea
