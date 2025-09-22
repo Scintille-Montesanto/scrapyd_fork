@@ -27,7 +27,7 @@ dependencies = [
     "packaging",
     "pywin32;platform_system=='Windows'",
     # "scrapy>=2.0.0",
-    "scrapy @ git+https://github.com/Scintille-Montesanto/scrapy_fork@master",
+    "scrapy @ git+https://github.com/Scintille-Montesanto/scrapy_fork@master#egg=scrapy==2.13.3b3",
     # https://setuptools.pypa.io/en/latest/history.html#v80-9-0
     "setuptools>=67.7.0,<81",
     "twisted>=17.9",

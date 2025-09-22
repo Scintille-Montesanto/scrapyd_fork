@@ -105,9 +105,63 @@ class SpiderList:
             self.cache[project].pop(None, None)
             self.cache[project].pop(version, None)
 
-
 spider_list = SpiderList()
 
+class SpiderBrandList:
+    cache: ClassVar = defaultdict(dict)
+
+    def get(self, project, version, *, runner):
+        """Return the ``scrapy list`` output for the project and version, using a cache if possible."""
+        try:
+            return self.cache[project][version]
+        except KeyError:
+            return self.set(project, version, runner=runner)
+
+    def set(self, project, version, *, runner):
+        """Calculate, cache and return the ``scrapy list`` output for the project and version, bypassing the cache."""
+
+        env = os.environ.copy()
+        env["PYTHONIOENCODING"] = "UTF-8"
+        env["SCRAPY_PROJECT"] = project
+        # If the version is not provided, then the runner uses the default version, determined by egg storage.
+        if version:
+            env["SCRAPYD_EGG_VERSION"] = version
+
+        args = [sys.executable, "-m", runner, "list_brands", "-s", "LOG_STDOUT=0"]
+        process = Popen(args, stdout=PIPE, stderr=PIPE, env=env)
+        stdout, stderr = process.communicate()
+        if process.returncode:
+            raise RunnerError((stderr or stdout or b"").decode())
+
+        spiders_brands = {}
+        for line in stdout.decode().splitlines():
+            if line:
+                spider_name, brands_str = line.split(': ', 1)
+                try:
+                    brands_dict = eval(brands_str)  # Safe since input is controlled by Scrapy
+                    spiders_brands[spider_name] = brands_dict
+                except (SyntaxError, ValueError):
+                    continue
+
+        # Note: If the cache is empty, that doesn't mean that this is the project's only version; it simply means that
+        # this is the first version called in this Scrapyd process.
+
+        # Evict the return value of version=None calls, since we can't determine whether this version is the default
+        # version (in which case we would overwrite it) or not (in which case we would keep it).
+        self.cache[project].pop(None, None)
+        self.cache[project][version] = spiders_brands
+        return spiders_brands
+
+    def delete(self, project, version=None):
+        if version is None:
+            self.cache.pop(project, None)
+        else:
+            # Evict the return value of version=None calls, since we can't determine whether this version is the
+            # default version (in which case we would pop it) or not (in which case we would keep it).
+            self.cache[project].pop(None, None)
+            self.cache[project].pop(version, None)
+
+spider_brand_list = SpiderBrandList()
 
 # WebserviceResource
 class WsResource(resource.Resource):
@@ -313,6 +367,17 @@ class ListSpiders(WsResource):
 
         return {"spiders": spider_list.get(project, version, runner=self.root.runner)}
 
+class ListBrands(WsResource):
+    @param("project")
+    @param("_version", dest="version", required=False, default=None)
+    def render_GET(self, txrequest, project, version):
+        if project not in self.root.poller.queues:
+            raise error.Error(code=http.OK, message=b"project '%b' not found" % project.encode())
+
+        if version and self.root.eggstorage.get(project, version) == (None, None):
+            raise error.Error(code=http.OK, message=b"version '%b' not found" % version.encode())
+
+        return {"spiders_brands": spider_brand_list.get(project, version, runner=self.root.runner)}
 
 class Status(WsResource):
     """
