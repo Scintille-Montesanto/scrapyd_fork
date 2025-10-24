@@ -1,0 +1,9 @@
+# curl http://localhost:6800/schedule.json -d setting=DOWNLOAD_DELAY=2 -d project=myproject -d spider=somespider
+POST http://localhost:6800/schedule.json
+Content-Type: application/x-www-form-urlencoded
+
+setting=DOWNLOAD_DELAY=2&project=sc_scrapy&spider=omegawatches
+
+
+###
+
